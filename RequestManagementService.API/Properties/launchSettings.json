@@ -3,7 +3,7 @@
     "RequestManagementService.API": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/service-requests",
+      "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

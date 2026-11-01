@@ -1,3 +1,4 @@
+using RequestManagementService.Application.Features.ServiceRequests.Common;
 using RequestManagementService.DataAccess.Entities;
 using RequestManagementService.Domain.ServiceRequests;
 
@@ -37,5 +38,15 @@ internal static class ServiceRequestMapper
         entity.Description = serviceRequest.Description;
         entity.Priority = serviceRequest.Priority;
         entity.Status = serviceRequest.Status;
+    }
+
+    public static ServiceRequestItem ToItem(ServiceRequest serviceRequest)
+    {
+        return new ServiceRequestItem(
+            serviceRequest.Id,
+            serviceRequest.Title,
+            serviceRequest.Description,
+            serviceRequest.Priority,
+            serviceRequest.Status);
     }
 }

@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using RequestManagementService.Application.Behaviors;
+using RequestManagementService.Application.Features.ServiceRequests.ChangeServiceRequestStatus;
 
 namespace RequestManagementService.Application.Extensions;
 
@@ -17,6 +18,8 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
+
+        services.AddSingleton<IServiceRequestStatusTransitions, ServiceRequestStatusTransitions>();
 
         return services;
     }

@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using RequestManagementService.API.ExceptionHandling;
+using RequestManagementService.Application.Extensions;
 using RequestManagementService.DataAccess.Extensions;
 
 namespace RequestManagementService.API;
@@ -8,11 +11,26 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
+        builder.Services
+            .AddControllers(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true)
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(
+                new JsonStringEnumConverter(allowIntegerValues: false)));
+
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
+        builder.Services.AddProblemDetails();
+        builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+
+        builder.Services.AddApplication();
         builder.Services.AddDataAccess(builder.Configuration);
 
         var app = builder.Build();
 
+        app.UseExceptionHandler();
+        app.UseStatusCodePages();
+        app.UseSwagger();
+        app.UseSwaggerUI();
         app.MapControllers();
 
         await app.Services.ApplyMigrationsAsync();
