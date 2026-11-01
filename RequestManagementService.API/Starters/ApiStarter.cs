@@ -19,6 +19,7 @@ internal static class ApiStarter
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
+        builder.Services.AddHealthChecks();
         builder.Services.AddProblemDetails();
         builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 
@@ -33,6 +34,7 @@ internal static class ApiStarter
         app.UseSwagger();
         app.UseSwaggerUI();
         app.MapControllers();
+        app.MapHealthChecks("/health");
 
         await app.Services.ApplyMigrationsAsync();
         await app.RunAsync();

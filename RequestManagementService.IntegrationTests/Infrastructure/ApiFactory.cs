@@ -44,9 +44,11 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting(
-            "ConnectionStrings:RequestManagement",
-            $"Host=localhost;Port={_postgres.PgPort};Database=request_management_tests;Username=postgres;Password=postgres");
+        builder.UseSetting("POSTGRES_HOST", "localhost");
+        builder.UseSetting("POSTGRES_PORT", _postgres.PgPort.ToString());
+        builder.UseSetting("POSTGRES_DB", "request_management_tests");
+        builder.UseSetting("POSTGRES_USER", "postgres");
+        builder.UseSetting("POSTGRES_PASSWORD", "postgres");
 
         builder.ConfigureTestServices(services =>
             services.Remove(services.Single(descriptor => descriptor.ImplementationType?.Name == "OutboxPublisher")));

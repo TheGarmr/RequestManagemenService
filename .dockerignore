@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/TestResults/
+**/appsettings.Local.json
+**/*.user
+.git/
+.vs/
+.idea/
+.env
+RequestManagementService.UnitTests/
+RequestManagementService.IntegrationTests/

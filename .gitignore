@@ -11,3 +11,4 @@ TestResults/
 coverage*.xml
 
 appsettings.Local.json
+data/
