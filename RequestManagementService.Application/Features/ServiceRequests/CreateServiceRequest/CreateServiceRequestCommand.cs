@@ -15,13 +15,16 @@ public sealed record CreateServiceRequestCommand(
 internal sealed class CreateServiceRequestCommandHandler : IRequestHandler<CreateServiceRequestCommand, ServiceRequestItem>
 {
     private readonly IServiceRequestRepository _serviceRequestRepository;
+    private readonly IOutboxRepository _outboxRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateServiceRequestCommandHandler(
         IServiceRequestRepository serviceRequestRepository,
+        IOutboxRepository outboxRepository,
         IUnitOfWork unitOfWork)
     {
         _serviceRequestRepository = serviceRequestRepository;
+        _outboxRepository = outboxRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -30,6 +33,7 @@ internal sealed class CreateServiceRequestCommandHandler : IRequestHandler<Creat
         var entity = ServiceRequestMapper.ToEntity(request);
 
         await _serviceRequestRepository.AddAsync(entity, cancellationToken);
+        await _outboxRepository.AddAsync(ServiceRequestMapper.ToOutboxMessage(entity, null), cancellationToken);
         await _unitOfWork.CommitAsync(cancellationToken);
 
         return ServiceRequestMapper.ToItem(entity);

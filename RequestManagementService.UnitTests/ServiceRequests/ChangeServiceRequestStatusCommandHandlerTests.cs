@@ -13,12 +13,13 @@ namespace RequestManagementService.UnitTests.ServiceRequests;
 public sealed class ChangeServiceRequestStatusCommandHandlerTests
 {
     private readonly IServiceRequestRepository _repository = Substitute.For<IServiceRequestRepository>();
+    private readonly IOutboxRepository _outboxRepository = Substitute.For<IOutboxRepository>();
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
     private readonly ChangeServiceRequestStatusCommandHandler _handler;
 
     public ChangeServiceRequestStatusCommandHandlerTests()
     {
-        _handler = new ChangeServiceRequestStatusCommandHandler(_repository, _unitOfWork, new ServiceRequestStatusTransitions());
+        _handler = new ChangeServiceRequestStatusCommandHandler(_repository, _outboxRepository, _unitOfWork, new ServiceRequestStatusTransitions());
     }
 
     [Fact]
@@ -43,6 +44,7 @@ public sealed class ChangeServiceRequestStatusCommandHandlerTests
             _handler.Handle(new ChangeServiceRequestStatusCommand(entity.Id, ServiceRequestStatus.New), CancellationToken.None));
 
         entity.Status.ShouldBe(ServiceRequestStatus.Done);
+        await _outboxRepository.DidNotReceive().AddAsync(Arg.Any<OutboxMessageEntity>(), Arg.Any<CancellationToken>());
         await _unitOfWork.DidNotReceive().CommitAsync(Arg.Any<CancellationToken>());
     }
 
@@ -58,6 +60,13 @@ public sealed class ChangeServiceRequestStatusCommandHandlerTests
 
         result.Status.ShouldBe(ServiceRequestStatus.InProgress);
         entity.Status.ShouldBe(ServiceRequestStatus.InProgress);
+        await _outboxRepository.Received(1).AddAsync(
+            Arg.Is<OutboxMessageEntity>(message =>
+                message.ServiceRequestId == entity.Id
+                && message.OldStatus == ServiceRequestStatus.New
+                && message.NewStatus == ServiceRequestStatus.InProgress
+                && message.Priority == entity.Priority),
+            Arg.Any<CancellationToken>());
         await _unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 

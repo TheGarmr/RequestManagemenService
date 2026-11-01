@@ -15,6 +15,8 @@ public sealed class RequestManagementDbContext : DbContext
 
     public DbSet<ServiceRequestEntity> ServiceRequests => Set<ServiceRequestEntity>();
 
+    public DbSet<OutboxMessageEntity> OutboxMessages => Set<OutboxMessageEntity>();
+
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SetTimestamps();
@@ -44,6 +46,25 @@ public sealed class RequestManagementDbContext : DbContext
 
             entity.HasIndex(x => new { x.Status, x.CreatedAt }).IsDescending(false, true);
         });
+
+        modelBuilder.Entity<OutboxMessageEntity>(entity =>
+        {
+            entity.ToTable("outbox_messages");
+
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).UseIdentityAlwaysColumn();
+
+            entity.Property(x => x.OldStatus).HasConversion<string>().HasMaxLength(16);
+            entity.Property(x => x.NewStatus).HasConversion<string>().HasMaxLength(16);
+            entity.Property(x => x.Priority).HasConversion<string>().HasMaxLength(16);
+
+            entity.Property(x => x.OccurredAt).HasColumnType("timestamp with time zone");
+            entity.Property(x => x.ProcessedAt).HasColumnType("timestamp with time zone");
+
+            entity.HasIndex(x => x.Id)
+                .HasDatabaseName("ix_outbox_messages_unprocessed")
+                .HasFilter("processed_at IS NULL");
+        });
     }
 
     private void SetTimestamps()
@@ -60,6 +81,14 @@ public sealed class RequestManagementDbContext : DbContext
             else if (entry.State == EntityState.Modified)
             {
                 entry.Entity.UpdatedAt = now;
+            }
+        }
+
+        foreach (var entry in ChangeTracker.Entries<OutboxMessageEntity>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.OccurredAt = now;
             }
         }
     }

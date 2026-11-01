@@ -16,15 +16,18 @@ public sealed record ChangeServiceRequestStatusCommand(
 internal sealed class ChangeServiceRequestStatusCommandHandler : IRequestHandler<ChangeServiceRequestStatusCommand, ServiceRequestItem>
 {
     private readonly IServiceRequestRepository _serviceRequestRepository;
+    private readonly IOutboxRepository _outboxRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IServiceRequestStatusTransitions _statusTransitions;
 
     public ChangeServiceRequestStatusCommandHandler(
         IServiceRequestRepository serviceRequestRepository,
+        IOutboxRepository outboxRepository,
         IUnitOfWork unitOfWork,
         IServiceRequestStatusTransitions statusTransitions)
     {
         _serviceRequestRepository = serviceRequestRepository;
+        _outboxRepository = outboxRepository;
         _unitOfWork = unitOfWork;
         _statusTransitions = statusTransitions;
     }
@@ -42,7 +45,10 @@ internal sealed class ChangeServiceRequestStatusCommandHandler : IRequestHandler
                 $"Status of service request '{request.Id}' cannot be changed from {entity.Status} to {request.Status}.");
         }
 
+        var oldStatus = entity.Status;
         entity.Status = request.Status;
+
+        await _outboxRepository.AddAsync(ServiceRequestMapper.ToOutboxMessage(entity, oldStatus), cancellationToken);
 
         try
         {

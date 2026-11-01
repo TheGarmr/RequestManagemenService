@@ -19,6 +19,17 @@ internal static class ServiceRequestMapper
         };
     }
 
+    public static OutboxMessageEntity ToOutboxMessage(ServiceRequestEntity entity, ServiceRequestStatus? oldStatus)
+    {
+        return new OutboxMessageEntity
+        {
+            ServiceRequestId = entity.Id,
+            OldStatus = oldStatus,
+            NewStatus = entity.Status,
+            Priority = entity.Priority
+        };
+    }
+
     public static ServiceRequestItem ToItem(ServiceRequestEntity entity)
     {
         return new ServiceRequestItem(
