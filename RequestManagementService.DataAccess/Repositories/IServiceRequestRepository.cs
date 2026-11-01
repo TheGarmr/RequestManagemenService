@@ -1,5 +1,5 @@
 using RequestManagementService.DataAccess.Entities;
-using RequestManagementService.Domain.ServiceRequests;
+using RequestManagementService.DataAccess.Enums;
 
 namespace RequestManagementService.DataAccess.Repositories;
 

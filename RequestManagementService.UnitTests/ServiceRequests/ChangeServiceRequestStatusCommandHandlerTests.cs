@@ -5,8 +5,8 @@ using RequestManagementService.Application.Exceptions;
 using RequestManagementService.Application.Features.ServiceRequests.ChangeServiceRequestStatus;
 using RequestManagementService.DataAccess;
 using RequestManagementService.DataAccess.Entities;
+using RequestManagementService.DataAccess.Enums;
 using RequestManagementService.DataAccess.Repositories;
-using RequestManagementService.Domain.ServiceRequests;
 
 namespace RequestManagementService.UnitTests.ServiceRequests;
 

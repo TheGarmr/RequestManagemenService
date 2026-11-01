@@ -6,18 +6,25 @@ using Microsoft.Extensions.DependencyInjection;
 using RequestManagementService.Application.Common;
 using RequestManagementService.Application.Features.ServiceRequests.Common;
 using RequestManagementService.DataAccess;
-using RequestManagementService.Domain.ServiceRequests;
+using RequestManagementService.DataAccess.Enums;
 using RequestManagementService.IntegrationTests.Infrastructure;
 
 namespace RequestManagementService.IntegrationTests.ServiceRequests;
 
 [Collection(ApiCollection.Name)]
-public sealed class ServiceRequestsApiTests(ApiFactory factory)
+public sealed class ServiceRequestsApiTests
 {
     private const string BaseUrl = "/api/service-requests";
 
-    private readonly HttpClient _client = factory.CreateClient();
+    private readonly ApiFactory _factory;
+    private readonly HttpClient _client;
     private readonly CancellationToken _cancellationToken = TestContext.Current.CancellationToken;
+
+    public ServiceRequestsApiTests(ApiFactory factory)
+    {
+        _factory = factory;
+        _client = factory.CreateClient();
+    }
 
     [Fact]
     public async Task Create_ReturnsCreatedWithLocationAndDefaults()
@@ -183,7 +190,7 @@ public sealed class ServiceRequestsApiTests(ApiFactory factory)
     [Fact]
     public async Task List_ReturnsPageSortedByNewestFirst()
     {
-        await factory.ResetDatabaseAsync();
+        await _factory.ResetDatabaseAsync();
         var first = await CreateAsync("First");
         var second = await CreateAsync("Second");
         var third = await CreateAsync("Third");
@@ -204,7 +211,7 @@ public sealed class ServiceRequestsApiTests(ApiFactory factory)
     [Fact]
     public async Task List_FiltersByStatus()
     {
-        await factory.ResetDatabaseAsync();
+        await _factory.ResetDatabaseAsync();
         await CreateAsync("Stays new");
         var started = await CreateAsync("Gets started");
         await ChangeStatusAsync(started.Id, "InProgress");
@@ -243,7 +250,7 @@ public sealed class ServiceRequestsApiTests(ApiFactory factory)
 
     private async Task<DataAccess.Entities.ServiceRequestEntity> FindEntityAsync(Guid id)
     {
-        await using var scope = factory.Services.CreateAsyncScope();
+        await using var scope = _factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<RequestManagementDbContext>();
 
         return await dbContext.ServiceRequests.AsNoTracking().SingleAsync(x => x.Id == id, _cancellationToken);

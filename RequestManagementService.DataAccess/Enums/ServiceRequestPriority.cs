@@ -1,4 +1,4 @@
-namespace RequestManagementService.Domain.ServiceRequests;
+namespace RequestManagementService.DataAccess.Enums;
 
 public enum ServiceRequestPriority
 {

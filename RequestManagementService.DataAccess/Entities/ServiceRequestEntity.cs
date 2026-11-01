@@ -1,4 +1,4 @@
-using RequestManagementService.Domain.ServiceRequests;
+using RequestManagementService.DataAccess.Enums;
 
 namespace RequestManagementService.DataAccess.Entities;
 

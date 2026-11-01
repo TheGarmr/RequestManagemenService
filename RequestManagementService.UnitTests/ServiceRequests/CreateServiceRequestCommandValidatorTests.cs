@@ -1,5 +1,5 @@
 using RequestManagementService.Application.Features.ServiceRequests.CreateServiceRequest;
-using RequestManagementService.Domain.ServiceRequests;
+using RequestManagementService.DataAccess.Enums;
 
 namespace RequestManagementService.UnitTests.ServiceRequests;
 

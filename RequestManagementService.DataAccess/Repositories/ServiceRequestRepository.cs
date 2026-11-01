@@ -1,14 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using RequestManagementService.DataAccess.Entities;
-using RequestManagementService.Domain.ServiceRequests;
+using RequestManagementService.DataAccess.Enums;
 
 namespace RequestManagementService.DataAccess.Repositories;
 
-internal sealed class ServiceRequestRepository(RequestManagementDbContext dbContext) : IServiceRequestRepository
+internal sealed class ServiceRequestRepository : IServiceRequestRepository
 {
+    private readonly RequestManagementDbContext _dbContext;
+
+    public ServiceRequestRepository(RequestManagementDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
     public Task<ServiceRequestEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return dbContext.ServiceRequests.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return _dbContext.ServiceRequests.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public Task<List<ServiceRequestEntity>> GetListAsync(
@@ -32,12 +39,12 @@ internal sealed class ServiceRequestRepository(RequestManagementDbContext dbCont
 
     public Task AddAsync(ServiceRequestEntity entity, CancellationToken cancellationToken)
     {
-        return dbContext.ServiceRequests.AddAsync(entity, cancellationToken).AsTask();
+        return _dbContext.ServiceRequests.AddAsync(entity, cancellationToken).AsTask();
     }
 
     private IQueryable<ServiceRequestEntity> Filter(ServiceRequestStatus? status)
     {
-        var query = dbContext.ServiceRequests.AsNoTracking();
+        var query = _dbContext.ServiceRequests.AsNoTracking();
 
         if (status is not null)
         {

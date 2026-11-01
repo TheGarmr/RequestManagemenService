@@ -1,7 +1,7 @@
 using RequestManagementService.Application.Features.ServiceRequests.Common;
 using RequestManagementService.Application.Features.ServiceRequests.CreateServiceRequest;
 using RequestManagementService.DataAccess.Entities;
-using RequestManagementService.Domain.ServiceRequests;
+using RequestManagementService.DataAccess.Enums;
 
 namespace RequestManagementService.Application.Mappers;
 

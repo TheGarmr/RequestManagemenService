@@ -1,9 +1,16 @@
 namespace RequestManagementService.DataAccess;
 
-internal sealed class UnitOfWork(RequestManagementDbContext dbContext) : IUnitOfWork
+internal sealed class UnitOfWork : IUnitOfWork
 {
+    private readonly RequestManagementDbContext _dbContext;
+
+    public UnitOfWork(RequestManagementDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
     public Task CommitAsync(CancellationToken cancellationToken)
     {
-        return dbContext.SaveChangesAsync(cancellationToken);
+        return _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

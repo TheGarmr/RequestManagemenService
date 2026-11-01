@@ -3,17 +3,23 @@ using MediatR;
 
 namespace RequestManagementService.Application.Behaviors;
 
-internal sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
-    : IPipelineBehavior<TRequest, TResponse>
+internal sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
+    private readonly IEnumerable<IValidator<TRequest>> _validators;
+
+    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+    {
+        _validators = validators;
+    }
+
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         var context = new ValidationContext<TRequest>(request);
-        var results = await Task.WhenAll(validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+        var results = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
         var failures = results.SelectMany(r => r.Errors).ToList();
 
         if (failures.Count > 0)

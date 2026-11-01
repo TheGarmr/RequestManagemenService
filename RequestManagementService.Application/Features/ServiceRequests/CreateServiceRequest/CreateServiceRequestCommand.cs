@@ -2,8 +2,8 @@ using MediatR;
 using RequestManagementService.Application.Features.ServiceRequests.Common;
 using RequestManagementService.Application.Mappers;
 using RequestManagementService.DataAccess;
+using RequestManagementService.DataAccess.Enums;
 using RequestManagementService.DataAccess.Repositories;
-using RequestManagementService.Domain.ServiceRequests;
 
 namespace RequestManagementService.Application.Features.ServiceRequests.CreateServiceRequest;
 
@@ -12,17 +12,25 @@ public sealed record CreateServiceRequestCommand(
     string? Description,
     ServiceRequestPriority Priority) : IRequest<ServiceRequestItem>;
 
-internal sealed class CreateServiceRequestCommandHandler(
-    IServiceRequestRepository serviceRequestRepository,
-    IUnitOfWork unitOfWork)
-    : IRequestHandler<CreateServiceRequestCommand, ServiceRequestItem>
+internal sealed class CreateServiceRequestCommandHandler : IRequestHandler<CreateServiceRequestCommand, ServiceRequestItem>
 {
+    private readonly IServiceRequestRepository _serviceRequestRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public CreateServiceRequestCommandHandler(
+        IServiceRequestRepository serviceRequestRepository,
+        IUnitOfWork unitOfWork)
+    {
+        _serviceRequestRepository = serviceRequestRepository;
+        _unitOfWork = unitOfWork;
+    }
+
     public async Task<ServiceRequestItem> Handle(CreateServiceRequestCommand request, CancellationToken cancellationToken)
     {
         var entity = ServiceRequestMapper.ToEntity(request);
 
-        await serviceRequestRepository.AddAsync(entity, cancellationToken);
-        await unitOfWork.CommitAsync(cancellationToken);
+        await _serviceRequestRepository.AddAsync(entity, cancellationToken);
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return ServiceRequestMapper.ToItem(entity);
     }

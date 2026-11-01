@@ -8,12 +8,18 @@ namespace RequestManagementService.Application.Features.ServiceRequests.GetServi
 
 public sealed record GetServiceRequestByIdQuery(Guid Id) : IRequest<ServiceRequestItem>;
 
-internal sealed class GetServiceRequestByIdQueryHandler(IServiceRequestRepository serviceRequestRepository)
-    : IRequestHandler<GetServiceRequestByIdQuery, ServiceRequestItem>
+internal sealed class GetServiceRequestByIdQueryHandler : IRequestHandler<GetServiceRequestByIdQuery, ServiceRequestItem>
 {
+    private readonly IServiceRequestRepository _serviceRequestRepository;
+
+    public GetServiceRequestByIdQueryHandler(IServiceRequestRepository serviceRequestRepository)
+    {
+        _serviceRequestRepository = serviceRequestRepository;
+    }
+
     public async Task<ServiceRequestItem> Handle(GetServiceRequestByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await serviceRequestRepository.GetByIdAsync(request.Id, cancellationToken)
+        var entity = await _serviceRequestRepository.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new NotFoundException($"Service request '{request.Id}' was not found.");
 
         return ServiceRequestMapper.ToItem(entity);

@@ -3,11 +3,16 @@ using RequestManagementService.DataAccess.Entities;
 
 namespace RequestManagementService.DataAccess;
 
-public sealed class RequestManagementDbContext(
-    DbContextOptions<RequestManagementDbContext> options,
-    TimeProvider timeProvider)
-    : DbContext(options)
+public sealed class RequestManagementDbContext : DbContext
 {
+    private readonly TimeProvider _timeProvider;
+
+    public RequestManagementDbContext(DbContextOptions<RequestManagementDbContext> options, TimeProvider timeProvider)
+        : base(options)
+    {
+        _timeProvider = timeProvider;
+    }
+
     public DbSet<ServiceRequestEntity> ServiceRequests => Set<ServiceRequestEntity>();
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -43,7 +48,7 @@ public sealed class RequestManagementDbContext(
 
     private void SetTimestamps()
     {
-        var now = timeProvider.GetUtcNow().UtcDateTime;
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
 
         foreach (var entry in ChangeTracker.Entries<ServiceRequestEntity>())
         {

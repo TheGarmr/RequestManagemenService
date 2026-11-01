@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using RequestManagementService.Domain.ServiceRequests;
+using RequestManagementService.DataAccess.Enums;
 
 namespace RequestManagementService.API.Contracts;
 

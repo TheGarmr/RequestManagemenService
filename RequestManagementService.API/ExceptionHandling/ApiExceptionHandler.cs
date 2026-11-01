@@ -6,11 +6,17 @@ using RequestManagementService.Application.Exceptions;
 
 namespace RequestManagementService.API.ExceptionHandling;
 
-internal sealed class ApiExceptionHandler(
-    IProblemDetailsService problemDetailsService,
-    ILogger<ApiExceptionHandler> logger)
-    : IExceptionHandler
+internal sealed class ApiExceptionHandler : IExceptionHandler
 {
+    private readonly IProblemDetailsService _problemDetailsService;
+    private readonly ILogger<ApiExceptionHandler> _logger;
+
+    public ApiExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<ApiExceptionHandler> logger)
+    {
+        _problemDetailsService = problemDetailsService;
+        _logger = logger;
+    }
+
     public ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
@@ -37,12 +43,12 @@ internal sealed class ApiExceptionHandler(
 
         if (problemDetails.Status == StatusCodes.Status500InternalServerError)
         {
-            logger.LogError(exception, "Unhandled exception while processing {Method} {Path}", httpContext.Request.Method, httpContext.Request.Path);
+            _logger.LogError(exception, "Unhandled exception while processing {Method} {Path}", httpContext.Request.Method, httpContext.Request.Path);
         }
 
         httpContext.Response.StatusCode = problemDetails.Status.GetValueOrDefault();
 
-        return problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+        return _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             ProblemDetails = problemDetails,

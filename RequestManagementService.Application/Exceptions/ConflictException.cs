@@ -1,3 +1,9 @@
 namespace RequestManagementService.Application.Exceptions;
 
-public sealed class ConflictException(string message) : Exception(message);
+public sealed class ConflictException : Exception
+{
+    public ConflictException(string message)
+        : base(message)
+    {
+    }
+}
