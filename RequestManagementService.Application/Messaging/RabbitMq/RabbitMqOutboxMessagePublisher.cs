@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using RabbitMQ.Client;
 using RequestManagementService.Application.Messaging.Contracts;
 using RequestManagementService.Application.Messaging.Outbox;
@@ -9,30 +7,30 @@ namespace RequestManagementService.Application.Messaging.RabbitMq;
 
 internal sealed class RabbitMqOutboxMessagePublisher : IOutboxMessagePublisher, IAsyncDisposable
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
-    {
-        Converters = { new JsonStringEnumConverter() }
-    };
-
     private static readonly CreateChannelOptions ChannelOptions = new(
         publisherConfirmationsEnabled: true,
         publisherConfirmationTrackingEnabled: true);
 
     private readonly RabbitMqConnectionProvider _connectionProvider;
     private readonly RabbitMqTopology _topology;
+    private readonly MessageSerializer _serializer;
     private IChannel? _channel;
 
-    public RabbitMqOutboxMessagePublisher(RabbitMqConnectionProvider connectionProvider, RabbitMqTopology topology)
+    public RabbitMqOutboxMessagePublisher(
+        RabbitMqConnectionProvider connectionProvider,
+        RabbitMqTopology topology,
+        MessageSerializer serializer)
     {
         _connectionProvider = connectionProvider;
         _topology = topology;
+        _serializer = serializer;
     }
 
     public async Task PublishAsync(OutboxMessageEntity message, CancellationToken cancellationToken)
     {
         var channel = await GetChannelAsync(cancellationToken);
 
-        var body = JsonSerializer.SerializeToUtf8Bytes(ToContract(message), JsonOptions);
+        var body = _serializer.Serialize(ToContract(message));
         var properties = new BasicProperties
         {
             MessageId = message.Id.ToString(),

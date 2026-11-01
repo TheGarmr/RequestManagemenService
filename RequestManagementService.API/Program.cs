@@ -1,40 +1,39 @@
-using System.Text.Json.Serialization;
-using RequestManagementService.API.ExceptionHandling;
-using RequestManagementService.Application.Extensions;
-using RequestManagementService.DataAccess.Extensions;
+using RequestManagementService.API.Starters;
 
 namespace RequestManagementService.API;
 
 public class Program
 {
-    private static async Task Main(string[] args)
+    private const string WorkModeKey = "WorkMode";
+
+    private static Task Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
+            .AddCommandLine(args)
+            .Build();
 
-        builder.Services
-            .AddControllers(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true)
-            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(
-                new JsonStringEnumConverter(allowIntegerValues: false)));
+        return GetWorkMode(configuration[WorkModeKey]) switch
+        {
+            WorkMode.Api => ApiStarter.StartAsync(args),
+            WorkMode.Worker => WorkerStarter.StartAsync(args),
+            var workMode => throw new InvalidOperationException($"Unsupported work mode '{workMode}'.")
+        };
+    }
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+    private static WorkMode GetWorkMode(string? value)
+    {
+        if (value is null)
+        {
+            return WorkMode.Api;
+        }
 
-        builder.Services.AddProblemDetails();
-        builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+        if (Enum.TryParse<WorkMode>(value, ignoreCase: true, out var workMode) && Enum.IsDefined(workMode))
+        {
+            return workMode;
+        }
 
-        builder.Services.AddApplication();
-        builder.Services.AddDataAccess(builder.Configuration);
-        builder.Services.AddMessaging(builder.Configuration);
-
-        var app = builder.Build();
-
-        app.UseExceptionHandler();
-        app.UseStatusCodePages();
-        app.UseSwagger();
-        app.UseSwaggerUI();
-        app.MapControllers();
-
-        await app.Services.ApplyMigrationsAsync();
-        await app.RunAsync();
+        throw new InvalidOperationException(
+            $"Unknown work mode '{value}'. Expected one of: {string.Join(", ", Enum.GetNames<WorkMode>())}.");
     }
 }
