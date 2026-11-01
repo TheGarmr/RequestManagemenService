@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "RequestManagementService.API": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "api/service-requests",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50753;http://localhost:50754"
+    }
+  }
+}
