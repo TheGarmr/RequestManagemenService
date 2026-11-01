@@ -32,9 +32,7 @@ internal sealed class ListServiceRequestsQueryHandler(IServiceRequestRepository 
             request.PageSize,
             cancellationToken);
 
-        var items = entities
-            .Select(entity => ServiceRequestMapper.ToItem(ServiceRequestMapper.ToDomain(entity)))
-            .ToList();
+        var items = entities.Select(ServiceRequestMapper.ToItem).ToList();
 
         return new PagedResult<ServiceRequestItem>(items, request.Page, request.PageSize, totalCount);
     }

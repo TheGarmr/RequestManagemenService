@@ -16,6 +16,6 @@ internal sealed class GetServiceRequestByIdQueryHandler(IServiceRequestRepositor
         var entity = await serviceRequestRepository.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new NotFoundException($"Service request '{request.Id}' was not found.");
 
-        return ServiceRequestMapper.ToItem(ServiceRequestMapper.ToDomain(entity));
+        return ServiceRequestMapper.ToItem(entity);
     }
 }

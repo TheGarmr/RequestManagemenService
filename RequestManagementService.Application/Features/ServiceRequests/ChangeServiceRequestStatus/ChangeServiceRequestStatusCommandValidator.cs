@@ -7,7 +7,6 @@ internal sealed class ChangeServiceRequestStatusCommandValidator : AbstractValid
     public ChangeServiceRequestStatusCommandValidator()
     {
         RuleFor(command => command.Status)
-            .NotNull()
             .IsInEnum();
     }
 }
