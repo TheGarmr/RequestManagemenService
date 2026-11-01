@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using RequestManagementService.DataAccess.Repositories;
 
 namespace RequestManagementService.DataAccess.Extensions;
 
@@ -19,6 +20,9 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<RequestManagementDbContext>(options => options
             .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention());
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IServiceRequestRepository, ServiceRequestRepository>();
 
         return services;
     }
