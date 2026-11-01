@@ -20,12 +20,20 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         await Services.ApplyMigrationsAsync();
     }
 
+    public async Task<T> QueryAsync<T>(Func<RequestManagementDbContext, Task<T>> query)
+    {
+        await using var scope = Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<RequestManagementDbContext>();
+
+        return await query(dbContext);
+    }
+
     public async Task ResetDatabaseAsync()
     {
         await using var scope = Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<RequestManagementDbContext>();
 
-        await dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE service_requests");
+        await dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE service_requests, outbox_messages");
     }
 
     public override async ValueTask DisposeAsync()
