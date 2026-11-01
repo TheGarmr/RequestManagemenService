@@ -1,7 +1,11 @@
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RequestManagementService.Application.Behaviors;
 using RequestManagementService.Application.Features.ServiceRequests.ChangeServiceRequestStatus;
+using RequestManagementService.Application.Messaging.Options;
+using RequestManagementService.Application.Messaging.Outbox;
+using RequestManagementService.Application.Messaging.RabbitMq;
 
 namespace RequestManagementService.Application.Extensions;
 
@@ -20,6 +24,20 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
 
         services.AddSingleton<IServiceRequestStatusTransitions, ServiceRequestStatusTransitions>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<RabbitMqOptions>(configuration.GetSection(RabbitMqOptions.SectionName));
+        services.Configure<OutboxOptions>(configuration.GetSection(OutboxOptions.SectionName));
+
+        services.AddSingleton<RabbitMqConnectionProvider>();
+        services.AddSingleton<RabbitMqTopology>();
+        services.AddSingleton<IOutboxMessagePublisher, RabbitMqOutboxMessagePublisher>();
+
+        services.AddHostedService<OutboxPublisher>();
 
         return services;
     }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MysticMind.PostgresEmbed;
@@ -38,5 +39,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting(
             "ConnectionStrings:RequestManagement",
             $"Host=localhost;Port={_postgres.PgPort};Database=request_management_tests;Username=postgres;Password=postgres");
+
+        builder.ConfigureTestServices(services =>
+            services.Remove(services.Single(descriptor => descriptor.ImplementationType?.Name == "OutboxPublisher")));
     }
 }

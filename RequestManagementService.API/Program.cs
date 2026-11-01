@@ -24,6 +24,7 @@ public class Program
 
         builder.Services.AddApplication();
         builder.Services.AddDataAccess(builder.Configuration);
+        builder.Services.AddMessaging(builder.Configuration);
 
         var app = builder.Build();
 
