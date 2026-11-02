@@ -4,7 +4,7 @@ using RequestManagementService.DataAccess.Enums;
 
 namespace RequestManagementService.DataAccess.Repositories;
 
-internal sealed class ServiceRequestRepository : IServiceRequestRepository
+public sealed class ServiceRequestRepository : IServiceRequestRepository
 {
     private readonly RequestManagementDbContext _dbContext;
 

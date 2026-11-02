@@ -3,7 +3,7 @@ using RequestManagementService.DataAccess.Entities;
 
 namespace RequestManagementService.DataAccess.Repositories;
 
-internal sealed class OutboxRepository : IOutboxRepository
+public sealed class OutboxRepository : IOutboxRepository
 {
     private readonly RequestManagementDbContext _dbContext;
 

@@ -2,7 +2,7 @@ using RequestManagementService.DataAccess.Enums;
 
 namespace RequestManagementService.Application.Features.ServiceRequests.ChangeServiceRequestStatus;
 
-internal sealed class ServiceRequestStatusTransitions : IServiceRequestStatusTransitions
+public sealed class ServiceRequestStatusTransitions : IServiceRequestStatusTransitions
 {
     private static readonly Dictionary<ServiceRequestStatus, ServiceRequestStatus[]> AllowedTransitions = new()
     {

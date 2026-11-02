@@ -1,5 +1,4 @@
-using RequestManagementService.Application.Extensions;
-using RequestManagementService.DataAccess.Extensions;
+using RequestManagementService.API.Extensions;
 
 namespace RequestManagementService.API.Starters;
 

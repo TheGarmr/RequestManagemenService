@@ -5,8 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MysticMind.PostgresEmbed;
 using RequestManagementService.API;
+using RequestManagementService.API.Extensions;
+using RequestManagementService.Application.Messaging.Outbox;
 using RequestManagementService.DataAccess;
-using RequestManagementService.DataAccess.Extensions;
 
 namespace RequestManagementService.IntegrationTests.Infrastructure;
 
@@ -51,6 +52,6 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("POSTGRES_PASSWORD", "postgres");
 
         builder.ConfigureTestServices(services =>
-            services.Remove(services.Single(descriptor => descriptor.ImplementationType?.Name == "OutboxPublisher")));
+            services.Remove(services.Single(descriptor => descriptor.ImplementationType == typeof(OutboxPublisher))));
     }
 }

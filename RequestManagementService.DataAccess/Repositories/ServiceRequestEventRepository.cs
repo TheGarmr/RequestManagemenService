@@ -3,7 +3,7 @@ using RequestManagementService.DataAccess.Entities;
 
 namespace RequestManagementService.DataAccess.Repositories;
 
-internal sealed class ServiceRequestEventRepository : IServiceRequestEventRepository
+public sealed class ServiceRequestEventRepository : IServiceRequestEventRepository
 {
     private readonly RequestManagementDbContext _dbContext;
 

@@ -9,7 +9,7 @@ using RequestManagementService.Application.Messaging.Contracts;
 
 namespace RequestManagementService.Application.Messaging.RabbitMq;
 
-internal sealed class ServiceRequestEventConsumer : BackgroundService
+public sealed class ServiceRequestEventConsumer : BackgroundService
 {
     private const ushort PrefetchCount = 10;
 
@@ -81,20 +81,24 @@ internal sealed class ServiceRequestEventConsumer : BackgroundService
 
     private async Task HandleMessageAsync(object source, BasicDeliverEventArgs args)
     {
-        var messageId = args.BasicProperties.MessageId;
+        if (!long.TryParse(args.BasicProperties.MessageId, out var messageId)
+            || !_serializer.TryDeserialize<ServiceRequestEventMessage>(args.Body, out var serviceRequest))
+        {
+            _logger.LogError("Message {MessageId} is malformed, sending it to the dead letter queue", args.BasicProperties.MessageId);
+            await _channel!.BasicRejectAsync(args.DeliveryTag, requeue: false, args.CancellationToken);
+            return;
+        }
+
+        _logger.LogInformation(
+            "Received message about service request with id {ServiceRequestId}",
+            serviceRequest.ServiceRequestId);
 
         try
         {
-            var serviceRequest = _serializer.Deserialize<ServiceRequestEventMessage>(args.Body);
-
-            _logger.LogInformation(
-                "Received message about service request with id {ServiceRequestId}",
-                serviceRequest.ServiceRequestId);
-
             await using var scope = _scopeFactory.CreateAsyncScope();
             var sender = scope.ServiceProvider.GetRequiredService<ISender>();
 
-            await sender.Send(ServiceRequestEventMapper.ToCommand(long.Parse(messageId!), serviceRequest), args.CancellationToken);
+            await sender.Send(ServiceRequestEventMapper.ToCommand(messageId, serviceRequest), args.CancellationToken);
             await _channel!.BasicAckAsync(args.DeliveryTag, multiple: false, args.CancellationToken);
         }
         catch (Exception exception)

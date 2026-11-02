@@ -12,7 +12,9 @@ services:
 
   rabbitmq:
     image: rabbitmq:4.4.0-management-alpine
-    env_file: .env
+    volumes:
+      - ./config/rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/20-request-management.conf:ro
+      - ./config/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
     ports:
       - "15672:15672"
     healthcheck:

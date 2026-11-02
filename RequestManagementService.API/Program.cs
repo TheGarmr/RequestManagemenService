@@ -1,3 +1,4 @@
+using RequestManagementService.API.Contracts;
 using RequestManagementService.API.Starters;
 
 namespace RequestManagementService.API;

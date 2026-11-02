@@ -7,15 +7,15 @@ namespace RequestManagementService.Application.Mappers;
 
 internal static class ServiceRequestMapper
 {
-    public static ServiceRequestEntity ToEntity(CreateServiceRequestCommand command)
+    public static ServiceRequestEntity ToEntity(CreateServiceRequestCommand command, ServiceRequestStatus status)
     {
         return new ServiceRequestEntity
         {
             Id = Guid.CreateVersion7(),
             Title = command.Title.Trim(),
-            Description = command.Description,
+            Description = command.Description?.Trim(),
             Priority = command.Priority,
-            Status = ServiceRequestStatus.New
+            Status = status
         };
     }
 

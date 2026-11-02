@@ -4,7 +4,7 @@ using RequestManagementService.Application.Messaging.Options;
 
 namespace RequestManagementService.Application.Messaging.RabbitMq;
 
-internal sealed class RabbitMqConnectionProvider : IAsyncDisposable
+public sealed class RabbitMqConnectionProvider : IAsyncDisposable
 {
     private readonly IOptions<RabbitMqOptions> _options;
     private readonly SemaphoreSlim _lock = new(1, 1);

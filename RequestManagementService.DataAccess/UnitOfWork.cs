@@ -1,6 +1,6 @@
 namespace RequestManagementService.DataAccess;
 
-internal sealed class UnitOfWork : IUnitOfWork
+public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly RequestManagementDbContext _dbContext;
 

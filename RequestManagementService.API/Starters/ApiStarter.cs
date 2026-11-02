@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using RequestManagementService.API.ExceptionHandling;
-using RequestManagementService.Application.Extensions;
-using RequestManagementService.DataAccess.Extensions;
+using RequestManagementService.API.Extensions;
+using RequestManagementService.DataAccess;
 
 namespace RequestManagementService.API.Starters;
 
@@ -19,7 +19,11 @@ internal static class ApiStarter
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddHealthChecks();
+        builder.Services
+            .AddHealthChecks()
+            .AddDbContextCheck<RequestManagementDbContext>()
+            .AddRabbitMqCheck();
+
         builder.Services.AddProblemDetails();
         builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 

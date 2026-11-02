@@ -30,7 +30,7 @@ internal sealed class CreateServiceRequestCommandHandler : IRequestHandler<Creat
 
     public async Task<ServiceRequestItem> Handle(CreateServiceRequestCommand request, CancellationToken cancellationToken)
     {
-        var entity = ServiceRequestMapper.ToEntity(request);
+        var entity = ServiceRequestMapper.ToEntity(request, ServiceRequestStatus.New);
 
         await _serviceRequestRepository.AddAsync(entity, cancellationToken);
         await _outboxRepository.AddAsync(ServiceRequestMapper.ToOutboxMessage(entity, null), cancellationToken);

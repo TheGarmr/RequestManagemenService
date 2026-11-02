@@ -5,7 +5,7 @@ using RequestManagementService.DataAccess.Entities;
 
 namespace RequestManagementService.Application.Messaging.RabbitMq;
 
-internal sealed class RabbitMqOutboxMessagePublisher : IOutboxMessagePublisher, IAsyncDisposable
+public sealed class RabbitMqOutboxMessagePublisher : IOutboxMessagePublisher, IAsyncDisposable
 {
     private static readonly CreateChannelOptions ChannelOptions = new(
         publisherConfirmationsEnabled: true,

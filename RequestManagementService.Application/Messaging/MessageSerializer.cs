@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,9 +16,18 @@ public sealed class MessageSerializer
         return JsonSerializer.SerializeToUtf8Bytes(message, Options);
     }
 
-    public T Deserialize<T>(ReadOnlyMemory<byte> body)
+    public bool TryDeserialize<T>(ReadOnlyMemory<byte> body, [NotNullWhen(true)] out T? message)
+        where T : class
     {
-        return JsonSerializer.Deserialize<T>(body.Span, Options)
-            ?? throw new JsonException($"Message body cannot be deserialized to {typeof(T).Name}.");
+        try
+        {
+            message = JsonSerializer.Deserialize<T>(body.Span, Options);
+        }
+        catch (JsonException)
+        {
+            message = null;
+        }
+
+        return message is not null;
     }
 }

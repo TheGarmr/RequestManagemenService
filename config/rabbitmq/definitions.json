@@ -1,0 +1,51 @@
+{
+  "users": [
+    {
+      "name": "admin",
+      "password_hash": "U4i9V4ecwkuq0wDbhIn9x8sgAuCIXXQzjPYYhseddnX1tThP",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    },
+    {
+      "name": "request_management",
+      "password_hash": "TiFsQZ8NKPOhTkH9Li5gHxqQ2E5enIr9I/6w9DHzzZrT3Q9v",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    },
+    {
+      "name": "request-management"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "admin",
+      "vhost": "request-management",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "request_management",
+      "vhost": "request-management",
+      "configure": "^(request-management\\.events(\\.dlx)?|service-management\\.service-request\\.upsert(\\.dlq)?)$",
+      "write": "^(request-management\\.events(\\.dlx)?|service-management\\.service-request\\.upsert(\\.dlq)?)$",
+      "read": "^(request-management\\.events(\\.dlx)?|service-management\\.service-request\\.upsert(\\.dlq)?)$"
+    }
+  ]
+}

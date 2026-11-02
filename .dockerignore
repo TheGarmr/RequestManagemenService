@@ -9,3 +9,4 @@
 .env
 RequestManagementService.UnitTests/
 RequestManagementService.IntegrationTests/
+config/

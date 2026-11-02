@@ -8,7 +8,7 @@ using RequestManagementService.DataAccess.Repositories;
 
 namespace RequestManagementService.Application.Messaging.Outbox;
 
-internal sealed class OutboxPublisher : BackgroundService
+public sealed class OutboxPublisher : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IOutboxMessagePublisher _messagePublisher;

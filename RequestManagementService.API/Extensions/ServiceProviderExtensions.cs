@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using RequestManagementService.DataAccess;
 
-namespace RequestManagementService.DataAccess.Extensions;
+namespace RequestManagementService.API.Extensions;
 
 public static class ServiceProviderExtensions
 {
